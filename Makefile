@@ -3,12 +3,12 @@ update:
 
 update_commit:
 	git checkout gh_pages
-	git rm data.json
-	git commit -m "tmp"
+	git rm data.js --ignore-unmatch
+	git commit -m "tmp" --allow-empty
 	git checkout master
 	node ./bin/update_data.js
 	git checkout gh_pages
-	git add data.json
-	git commit -m "Updated json." --amend
+	git add data.js
+	git commit -m "Updated data.js." --amend
 	git checkout master
 
