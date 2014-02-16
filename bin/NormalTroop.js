@@ -1,9 +1,20 @@
 var _ = require('underscore');
+
 var NormalTroop = function(name, baseData, levelData){
     this._name = name;
     this._isDard = false;
-    this._baseData = baseData;
-    this._levelData = levelData;
+    this._baseData = _.extend({
+        SPACE: false,
+        TIME: false,
+    }, baseData);
+    this._levelData = levelData.map(function(data){
+        return _.extend({
+            LEVEL: false,
+            DAMAGE: false,
+            HP: false,
+            COST: false,
+        }, data);
+    });
 };
 
 _.extend(NormalTroop.prototype, {
