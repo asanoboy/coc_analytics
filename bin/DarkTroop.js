@@ -3,7 +3,7 @@ var util = require('util');
 
 var DarkTroop = function(name, baseData, levelData){
     NormalTroop.call(this, name, baseData, levelData);
-    this.isDark = true;
+    this._isDark = true;
 };
 
 util.inherits(DarkTroop, NormalTroop);

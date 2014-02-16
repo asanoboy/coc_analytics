@@ -174,9 +174,8 @@ _.extend(Builder.prototype, {
 
     parseTable: function(clms, $table, $){
         var indexToClm = {};
-
         $table.find('tr').eq(0).find('th').each(function(i, th){
-            var text = $(th).text().replace(/\n/g, '');
+            var text = $(th).text().replace(/(^\s*)|\n|(\s*$)/g, '');
             if( clms.indexOf(text) !== -1 ){
                 indexToClm[i] = text;
             }
@@ -187,7 +186,7 @@ _.extend(Builder.prototype, {
             $(tr).find('td').each(function(j, td){
                 if( j in indexToClm ){
                     data || (data={});
-                    var text = $(td).text().replace(/\n/g, '');
+                    var text = $(td).text().replace(/(\n|,)/g, '');
                     data[indexToClm[j]] = parseInt(text, 10);
                 }
             });

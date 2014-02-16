@@ -2,7 +2,7 @@ var _ = require('underscore');
 
 var NormalTroop = function(name, baseData, levelData){
     this._name = name;
-    this._isDard = false;
+    this._isDark = false;
     this._baseData = _.extend({
         SPACE: false,
         TIME: false,
