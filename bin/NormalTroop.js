@@ -20,6 +20,7 @@ var NormalTroop = function(name, baseData, levelData){
 _.extend(NormalTroop.prototype, {
     toObject: function(){
         return {
+            name: this._name,
             base: this._baseData,
             level: this._levelData,
             isDark: this._isDark,
