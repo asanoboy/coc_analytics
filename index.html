@@ -21,9 +21,26 @@
       }
       #slide-container {
         position: absolute;
+        padding: 3px;
         display: none;
-        background-color: #595;
-        opacity: 0.3;
+        background-color: #444;
+        opacity: 0.9;
+        box-sizing: border-box;
+      }
+      #slide-container p,
+      #slide-container h2 {
+        color: #000;
+      }
+      #slide-container hr {
+        color: #000;
+        margin: 20px 0;
+      }
+      #panel-content {
+        background-color: #EEE;
+        width: 100%;
+        height: 100%;
+        padding: 10px;
+        box-sizing: border-box;
       }
 
       svg {
@@ -43,7 +60,7 @@
       .x.axis line, .x.axis path,
       .y.axis line, .y.axis path {
         fill: none;
-        stroke: #333;
+        stroke: #555;
       }
 
       .circle {
@@ -72,7 +89,39 @@
         </footer>
       </div>
       <div id="slide-container">
-        <section id="panel_content"></section>
+        <section id="panel-content">
+          <h3>Graph Condition</h3>
+          <hr>
+          <p>X Axis<br/> 
+            X =
+            <select id="x-value1">
+            </select>
+            <select id="x-operator">
+            </select>
+            <select id="x-value2">
+            </select>
+          </p>
+          <hr>
+          <p>Y Axis<br/>
+            Y = 
+            <select id="y-value1">
+            </select>
+            <select id="y-operator">
+            </select>
+            <select id="y-value2">
+            </select>
+          </p>
+          <hr>
+          <p>Radius<br/>
+            R = 
+            <select id="r-value1">
+            </select>
+            <select id="r-operator">
+            </select>
+            <select id="r-value2">
+            </select>
+          </p>
+        </section>
       </div>
     </div>
     <script src="javascripts/main.js"></script>
