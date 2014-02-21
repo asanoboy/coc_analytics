@@ -33,7 +33,7 @@
       }
       #slide-container hr {
         color: #000;
-        margin: 20px 0;
+        margin: 15px 0;
       }
       #panel-content {
         background-color: #EEE;
@@ -63,9 +63,76 @@
         stroke: #555;
       }
 
-      .circle {
-
+      .troop-circle {
+        stroke: black;
+        stroke-width: 2;
+        fill-opacity: 0.7;
       }
+      .troop-circle.active {
+        fill-opacity: 1;
+        stroke-width: 3;
+      }
+      .troop-circle.Bar {
+        fill: #FFFF35;
+        stroke: #9C453B;
+      }
+      .troop-circle.Arc {
+        fill: #D51461;
+        stroke: #B7D33C;
+      }
+      .troop-circle.Gob {
+        fill: #BCDF82;
+        stroke: #723814;
+      }
+      .troop-circle.Gia {
+        fill: #FFD6B3;
+        stroke: #F26A04;
+      }
+      .troop-circle.Wal {
+        fill: #FBF2D9;
+        stroke: #D77632;
+      }
+      .troop-circle.Bal {
+        fill: #FCC320;
+        stroke: #D5B389;
+      }
+      .troop-circle.Wiz {
+        fill: #FCE9D4;
+        stroke: #779BDB;
+      }
+      .troop-circle.Hea {
+        fill: #F3F77A;
+        stroke: #F1E0AF;
+      }
+      .troop-circle.Dra {
+        fill: #3D295C;
+        stroke: #CC506F;
+      }
+      .troop-circle.PEK {
+        fill: #425D73;
+        stroke: #D279FE;
+      }
+      .troop-circle.Min {
+        fill: #4B88BB;
+        stroke: #3D3242;
+      }
+      .troop-circle.Hog {
+        fill: #FED0D2;
+        stroke: #C7704D;
+      }
+      .troop-circle.Val {
+        fill: #F4B8A3;
+        stroke: #F46D29;
+      }
+      .troop-circle.Gol {
+        fill: #D1B89D;
+        stroke: #DE74B5;
+      }
+      .troop-circle.Wit {
+        fill: #EBD6E1;
+        stroke: #474277;
+      }
+
     </style>
   </head>
 
@@ -75,6 +142,10 @@
 
     <div id="container">
       <div id="inner-container" class="inner">
+
+        <section class="header">
+          <span class="toggle-cond">COND</span>
+        </section>
 
         <header>
           <h1>Coc analytics</h1>

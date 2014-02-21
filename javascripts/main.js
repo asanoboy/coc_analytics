@@ -1,9 +1,29 @@
+var svg, slide, graph, activeCircle,
+    windowWidth, condition = {},
+    xScale, yScale, rScale, xAxis, yAxis,
+    costScaleFromDark, isSlideVisible = false;
+initData();
 initSvg();
 initSlide();
 initGraph();
-drawGraph();
 
-var svg, slide, windowWidth, condition = {};
+function initData(){
+    var maxCost = 0, maxDarkCost = 0;
+    data.forEach(function(each){
+        each.level.forEach(function(eachLevel){
+            if( each.isDark ){
+                maxDarkCost = Math.max(maxDarkCost, eachLevel.COST);
+            }
+            else {
+                maxCost = Math.max(maxCost, eachLevel.COST);
+            }
+        });
+    });
+    costScaleFromDark = d3.scale.linear()
+        .domain([0, maxDarkCost])
+        .range([0, maxCost])
+    ;
+}
 
 function initSvg(){
     var w = window,
@@ -13,7 +33,7 @@ function initSvg(){
         windowHeight = w.innerHeight|| e.clientHeight|| g.clientHeight;
     windowWidth = w.innerWidth || e.clientWidth || g.clientWidth;
 
-    var minMargin = 50,
+    var minMargin = 30,
         canvasWidth = d3.select('#inner-container').node().offsetWidth,
         canvasHeight = windowHeight - d3.select('#inner-container').node().offsetHeight,
         graphWidth = Math.min(canvasWidth - minMargin * 2, canvasHeight - minMargin * 2),
@@ -25,25 +45,11 @@ function initSvg(){
             right:  (canvasWidth - graphWidth)/2,
         };
 
-    // Scales and axes. Note the inverted domain for the y-scale: bigger is up!
-    var x = d3.scale.linear().range([0, graphWidth]),
-        y = d3.scale.linear().range([graphHeight, 0]),
-        xAxis = d3.svg.axis().scale(x).ticks(4).tickSize(3);
-        yAxis = d3.svg.axis().scale(y).ticks(4).tickSize(3).orient('left');
-
-
-    // An area generator, for the light fill.
-    // var area = d3.svg.area()
-    //     .interpolate("monotone")
-    //     .x(function(d) { return x(d.date); })
-    //     .y0(graphWidth)
-    //     .y1(function(d) { return y(d.price); });
-
-    // A line generator, for the dark stroke.
-    // var line = d3.svg.line()
-    //     .interpolate("monotone")
-    //     .x(function(d) { return x(d.date); })
-    //     .y(function(d) { return y(d.price); });
+    xScale = d3.scale.linear().range([0, graphWidth]);
+    yScale = d3.scale.linear().range([graphHeight, 0]);
+    rScale = d3.scale.linear().range([5, 20]);
+    xAxis = d3.svg.axis().scale(xScale).ticks(4).tickSize(3);
+    yAxis = d3.svg.axis().scale(yScale).ticks(4).tickSize(3).orient('left');
 
     svg = d3.select("#main_content").append("svg");
     graph = svg
@@ -57,32 +63,18 @@ function initSvg(){
         .attr("transform", "translate(0," + graphHeight + ")")
         .call(xAxis);
 
-    // Add the y-axis.
     graph.append("g")
         .attr("class", "y axis")
         // .attr("transform", "translate(" + minMargin + ",0)") 
         .call(yAxis);
 
-    // graph.append("g")
-    //     .attr("class", "circle")
-    //     .selectAll("circle")
-    //     .data(data)
-    //     .enter()
-    //     .append("circle")
-    //     .attr("r", function(d){ return Math.random() * 30;})
-    //     .attr("cx", function(d){ return Math.random() * 30;})
-    //     .attr("cy", function(d){ return Math.random() * 30;})
-    //     .on("click", click)
-    //     ;
-
-    function click(d){
-        debugger;
-    }
+    graph.append("g")
+        .attr("class", 'circle');
 }
 
 function initSlide(){
     var leftDest = svg.node().getBoundingClientRect().left,
-        leftOrig = windowWidth - 10;
+        leftOrig = windowWidth + 10;
     slide = d3.select('#slide-container')
         .style('display', 'block')
         .style('width', svg.node().clientWidth + 'px')
@@ -92,26 +84,19 @@ function initSlide(){
     ;
 
     var lastPageX = false;
-    d3.select('#container')
-        .on('touchmove', function(){
-            if( lastPageX !== false ){
-                slide.style(
-                    'left',
-                    (parseInt(slide.style('left'), 10) +
-                    ( d3.event.touches[0].pageX - lastPageX)) + 'px'
-                );
-            }
-            lastPageX = d3.event.touches[0].pageX;
-        })
+    d3.select('.toggle-cond')
         .on('touchend', function(){
-            lastPageX = false;
-            if( parseInt(slide.style('left'), 10) > windowWidth / 2 ){
-                slide.transition()
+            if( isSlideVisible ){
+                slide
+                    // .transition()
                     .style('left', leftOrig + 'px');
+                isSlideVisible = false;
             }
             else {
-                slide.transition()
+                slide
+                    // .transition()
                     .style('left', leftDest + 'px');
+                isSlideVisible = true;
             }
         });
 
@@ -119,11 +104,11 @@ function initSlide(){
 
 function convertString(string){
     switch(string){
-        case 'SPACE': return 'Space';
-        case 'TIME': return 'Time';
-        case 'DAMAGE': return 'Damage';
-        case 'HP': return 'Hitpoints';
-        case 'COST': return 'Cost';
+        case 'SPACE':   return 'Space';
+        case 'TIME':    return 'Time';
+        case 'DAMAGE':  return 'Damage';
+        case 'HP':      return 'Hitpoints';
+        case 'COST':    return 'Elixir';
         default:
             return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
     }
@@ -158,7 +143,6 @@ function initGraph(){
 
     var operators = [
         ['', ''],
-        ['add', '+'],
         ['div', '/'],
         ['mul', 'x'],
     ];
@@ -183,6 +167,7 @@ function initGraph(){
             .html(function(d){ return d[1]; })
         ;
     });
+
     onChangeCondition();
 }
 
@@ -212,12 +197,119 @@ function onChangeCondition(){
             value2: getSelectboxValue(slide.select(ar[3]).node()),
         };
     });
+    drawGraph();
+}
+
+function applyOperator(value1, value2, operator){
+    switch(operator){
+        case 'div':
+            return value1 / value2;
+        case 'mul':
+            return value1 * value2;
+        default:
+            return value1;
+    }
+}
+
+function calcValue(eachData, eachLevel, eachCond){
+    var value1, value2, result;
+    if( eachCond.value1 in eachData.base ){
+        value1 = eachData.base[eachCond.value1];
+    }
+    else if( eachCond.value1 in eachLevel ){
+        value1 = eachLevel[eachCond.value1];
+    }
+    if(eachCond.value1 === 'COST' && eachData.isDark ){
+        value1 = costScaleFromDark(value1);
+    }
+
+    if( eachCond.value2 in eachData.base ){
+        value2 = eachData.base[eachCond.value2];
+    }
+    else if( eachCond.value2 in eachLevel ){
+        value2 = eachLevel[eachCond.value2];
+    }
+    if(eachCond.value2 === 'COST' && eachData.isDark ){
+        value2 = costScaleFromDark(value2);
+    }
+
+    result = applyOperator(value1, value2, eachCond.operator);
+
+    return result;
 }
 
 function drawGraph() {
+    var maxX = 0,
+        maxY = 0,
+        maxR = 0,
+        inputData = data.reduce(function(rt, each){
+            return rt.concat(each.level.map(function(eachLevel){
+                var x = calcValue(each, eachLevel, condition.x),
+                    y = calcValue(each, eachLevel, condition.y),
+                    r = calcValue(each, eachLevel, condition.r);
+                maxX = Math.max(maxX, x);
+                maxY = Math.max(maxY, y);
+                maxR = Math.max(maxR, r);
+                return {
+                    x:x,
+                    y:y,
+                    r:r,
+                    className: each.name.split('.').join('').slice(0, 3),
+                    base: each,
+                    level: eachLevel,
+                };
+            }));
+        }, []);
 
+    xScale.domain([0, maxX]);
+    yScale.domain([0, maxY]);
+    rScale.domain([0, maxR]);
+    graph.select('.x.axis').call(xAxis);
+    graph.select('.y.axis').call(yAxis);
 
-}
+    var circle = graph.select(".circle")
+        .selectAll("circle")
+        .data(inputData);
 
-function initGesture(){
+    circle
+        .on("touchstart", onTouchStart)
+        // .on('touchend', onTouchEnd)
+        // .transition()
+        .attr("class", function(d){ return "troop-circle " + d.className; })
+        .attr("r", function(d){ return rScale(d.r);})
+        .attr("cx", function(d){ return xScale(d.x); })
+        .attr("cy", function(d){ return yScale(d.y); })
+        ;
+
+    circle.enter()
+        .append("circle")
+        .on("touchstart", onTouchStart)
+        // .on('touchend', onTouchEnd)
+        .attr("class", function(d){ return "troop-circle " + d.className; })
+        .attr("r", function(d){ return rScale(d.r);})
+        .attr("cx", function(d){ return xScale(d.x); })
+        .attr("cy", function(d){ return yScale(d.y); })
+        ;
+
+    circle.exit()
+        .remove()
+        ;
+
+    function onTouchStart(d){
+        if( activeCircle ){
+            d3.select(activeCircle)
+                .classed("active", false);
+        }
+
+        if( activeCircle === this ){
+            activeCircle = false;
+        }
+        else {
+            activeCircle = this;
+            d3.select(this)
+                .classed("active", true)
+            ;
+        }
+
+    }
 }
