@@ -1,9 +1,11 @@
 var svg, slide, graph, activeCircle,
+    tooltip, xAxisLabel, yAxisLabel,
     windowWidth, condition = {},
     xScale, yScale, rScale, xAxis, yAxis,
     costScaleFromDark, isSlideVisible = false;
 initData();
 initSvg();
+initLabel();
 initSlide();
 initGraph();
 
@@ -41,8 +43,8 @@ function initSvg(){
         margin = {
             top:    (canvasHeight - graphHeight)/2,
             bottom: (canvasHeight - graphHeight)/2,
-            left:   (canvasWidth - graphWidth)/2,
-            right:  (canvasWidth - graphWidth)/2,
+            left:   (canvasWidth - graphWidth)/2 + 10,
+            right:  (canvasWidth - graphWidth)/2 - 10,
         };
 
     xScale = d3.scale.linear().range([0, graphWidth]);
@@ -70,6 +72,25 @@ function initSvg(){
 
     graph.append("g")
         .attr("class", 'circle');
+
+
+    xAxisLabel = d3.select('#x-axis-label')
+        .style('width', graphWidth + 'px')
+        .style('left', (margin.left) + 'px')
+        .style('top', (graphHeight + margin.top + 20) + 'px')
+        .select('p')
+        ;
+
+    yAxisLabel = d3.select('#y-axis-label')
+        .style('width', graphHeight + 'px')
+        .style('left', (margin.left - 40) + 'px')
+        .style('top', (graphHeight + margin.top ) + 'px')
+        .select('p')
+        ;
+
+}
+
+function initLabel(){
 }
 
 function initSlide(){
@@ -169,10 +190,15 @@ function initGraph(){
     });
 
     onChangeCondition();
+    svg.on("touchstart", onTouchSvg);
 }
 
 function getSelectboxValue(node){
     return node.options[node.selectedIndex].value;
+}
+
+function getSelectboxText(node){
+    return node.options[node.selectedIndex].text;
 }
 
 function onChangeCondition(){
@@ -239,6 +265,22 @@ function calcValue(eachData, eachLevel, eachCond){
 }
 
 function drawGraph() {
+
+    [
+        [xAxisLabel, '#x-operator', '#x-value1', '#x-value2'],
+        [yAxisLabel, '#y-operator', '#y-value1', '#y-value2'],
+    ].forEach(function(ar){
+        var label = ar[0],
+            value1 = getSelectboxText(slide.select(ar[2]).node()),
+            operator = getSelectboxText(slide.select(ar[1]).node()),
+            value2 = getSelectboxText(slide.select(ar[3]).node());
+        label.html(
+            operator ?
+            value1 + ' ' + operator + ' ' + value2:
+            value1
+        );
+
+    });
     var maxX = 0,
         maxY = 0,
         maxR = 0,
@@ -273,8 +315,6 @@ function drawGraph() {
 
     circle
         .on("touchstart", onTouchStart)
-        // .on('touchend', onTouchEnd)
-        // .transition()
         .attr("class", function(d){ return "troop-circle " + d.className; })
         .attr("r", function(d){ return rScale(d.r);})
         .attr("cx", function(d){ return xScale(d.x); })
@@ -284,7 +324,6 @@ function drawGraph() {
     circle.enter()
         .append("circle")
         .on("touchstart", onTouchStart)
-        // .on('touchend', onTouchEnd)
         .attr("class", function(d){ return "troop-circle " + d.className; })
         .attr("r", function(d){ return rScale(d.r);})
         .attr("cx", function(d){ return xScale(d.x); })
@@ -295,21 +334,36 @@ function drawGraph() {
         .remove()
         ;
 
-    function onTouchStart(d){
-        if( activeCircle ){
-            d3.select(activeCircle)
-                .classed("active", false);
-        }
+}
 
-        if( activeCircle === this ){
-            activeCircle = false;
-        }
-        else {
-            activeCircle = this;
-            d3.select(this)
-                .classed("active", true)
-            ;
-        }
+function showData(circle){
+    d3.select(circle)
+        .classed("active", true)
+    ;
+    activeCircle = circle;
+}
 
+function hideData(){
+    d3.select(activeCircle)
+        .classed("active", false);
+}
+
+function onTouchSvg(){
+    if( activeCircle ){
+        hideData();
     }
+}
+
+function onTouchStart(d){
+    if( activeCircle ){
+        hideData();
+    }
+
+    if( activeCircle === this ){
+        activeCircle = false;
+    }
+    else {
+        showData(this);
+    }
+    d3.event.stopPropagation();
 }

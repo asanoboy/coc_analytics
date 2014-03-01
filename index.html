@@ -19,6 +19,9 @@
         overflow: hidden;
         position: relative;
       }
+      #main_content {
+        position: relative;
+      }
       #slide-container {
         position: absolute;
         padding: 3px;
@@ -41,6 +44,35 @@
         height: 100%;
         padding: 10px;
         box-sizing: border-box;
+      }
+      #x-axis-label {
+        position: absolute;
+      }
+      #x-axis-label p {
+        font-weight: bold;
+        text-align: center;
+        font-size: 1.1em;
+      }
+
+      #y-axis-label {
+        position: absolute;
+      }
+
+      #y-axis-label p {
+        font-weight: bold;
+        text-align: center;
+        font-size: 1.1em;
+
+        transform: rotate(-90deg);
+        -moz-transform: rotate(-90deg);
+        -webkit-transform: rotate(-90deg);
+        -o-transform: rotate(-90deg);
+        -ms-transform: rotate(-90deg);
+
+        -moz-transform-origin: left top;
+        -webkit-transform-origin: left top;
+        -o-transform-origin: left top;
+        -ms-transform-origin: left top;
       }
 
       svg {
@@ -153,7 +185,10 @@
         </header>
         <hr>
 
-        <section id="main_content"></section>
+        <section id="main_content">
+          <div id="y-axis-label"><p>left</p></div>
+          <div id="x-axis-label"><p>bottom</p></div>
+        </section>
 
         <footer>
           Coc analytics is maintained by <a href="https://github.com/asanoboy">asanoboy</a>.
