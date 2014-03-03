@@ -75,7 +75,17 @@ _.extend(Builder.prototype, {
         return Q.allSettled([
             this.createTroopsD(NORMAL_TROOPS, NormalTroop)
                 .then(function(troopList){
-                    this._normalTroops = troopList;
+                    this._normalTroops = troopList.map(function(troop){
+                        var data;
+                        if( troop.getName()==='Wall Breaker' ){
+                            data = troop.getLevelData();
+                            data = data.map(function(d){
+                                d.DAMAGE /= 40;
+                                return d;
+                            });
+                        }
+                        return troop;
+                    });
                     return Q.defer().resolve().promise;
                 }.bind(this)),
             this.createTroopsD(DARK_TROOPS, DarkTroop)

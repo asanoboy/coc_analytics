@@ -26,6 +26,12 @@ _.extend(NormalTroop.prototype, {
             isDark: this._isDark,
         };
     },
+    getName: function(){
+        return this._name;
+    },
+    getLevelData: function(){
+        return this._levelData;
+    }
 });
 
 module.exports = NormalTroop;
