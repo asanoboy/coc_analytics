@@ -1,11 +1,11 @@
 var svg, slide, graph, activeCircle,
     tooltip, xAxisLabel, yAxisLabel,
-    windowWidth, condition = {},
-    xScale, yScale, rScale, xAxis, yAxis,
-    costScaleFromDark, isSlideVisible = false;
+    windowHeight, windowWidth, condition = {},
+    xScale, yScale, rScale, xAxis, yAxis, margin,
+    costScaleFromDark, isSlideVisible = false,
+    CLICK_EVENT = 'click';//touchstart';
 initData();
 initSvg();
-initLabel();
 initSlide();
 initGraph();
 
@@ -31,8 +31,8 @@ function initSvg(){
     var w = window,
         d = document,
         e = d.documentElement,
-        g = d.getElementsByTagName('body')[0],
-        windowHeight = w.innerHeight|| e.clientHeight|| g.clientHeight;
+        g = d.getElementsByTagName('body')[0];
+    windowHeight = w.innerHeight|| e.clientHeight|| g.clientHeight;
     windowWidth = w.innerWidth || e.clientWidth || g.clientWidth;
 
     var minMargin = 30,
@@ -40,16 +40,18 @@ function initSvg(){
         canvasHeight = windowHeight - d3.select('#inner-container').node().offsetHeight,
         graphWidth = Math.min(canvasWidth - minMargin * 2, canvasHeight - minMargin * 2),
         graphHeight = graphWidth,
-        margin = {
-            top:    (canvasHeight - graphHeight)/2,
-            bottom: (canvasHeight - graphHeight)/2,
-            left:   (canvasWidth - graphWidth)/2 + 10,
-            right:  (canvasWidth - graphWidth)/2 - 10,
-        };
+        maxRadius = graphWidth / 15,
+        minRadius = maxRadius / 3;
+    margin = {
+        top:    (canvasHeight - graphHeight)/2,
+        bottom: (canvasHeight - graphHeight)/2,
+        left:   (canvasWidth - graphWidth)/2 + 10,
+        right:  (canvasWidth - graphWidth)/2 - 10,
+    };
 
     xScale = d3.scale.linear().range([0, graphWidth]);
     yScale = d3.scale.linear().range([graphHeight, 0]);
-    rScale = d3.scale.linear().range([5, 20]);
+    rScale = d3.scale.linear().range([minRadius, maxRadius]);
     xAxis = d3.svg.axis().scale(xScale).ticks(4).tickSize(3);
     yAxis = d3.svg.axis().scale(yScale).ticks(4).tickSize(3).orient('left');
 
@@ -83,14 +85,11 @@ function initSvg(){
 
     yAxisLabel = d3.select('#y-axis-label')
         .style('width', graphHeight + 'px')
-        .style('left', (margin.left - 40) + 'px')
-        .style('top', (graphHeight + margin.top ) + 'px')
+        .style('left', ( -graphWidth + margin.left - 40) + 'px')
+        .style('top', ( margin.top ) + 'px')
         .select('p')
         ;
 
-}
-
-function initLabel(){
 }
 
 function initSlide(){
@@ -106,7 +105,7 @@ function initSlide(){
 
     var lastPageX = false;
     d3.select('.toggle-cond')
-        .on('touchend', function(){
+        .on(CLICK_EVENT, function(){
             if( isSlideVisible ){
                 slide
                     // .transition()
@@ -129,7 +128,7 @@ function convertString(string){
         case 'TIME':    return 'Time';
         case 'DAMAGE':  return 'Damage';
         case 'HP':      return 'Hitpoints';
-        case 'COST':    return 'Elixir';
+        case 'COST':    return 'Cost';
         default:
             return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
     }
@@ -189,8 +188,12 @@ function initGraph(){
         ;
     });
 
+    slide.selectAll("input[name=filter]")
+        .on('change', onChangeCondition)
+    ;
+
     onChangeCondition();
-    svg.on("touchstart", onTouchSvg);
+    svg.on(CLICK_EVENT, onTouchSvg);
 }
 
 function getSelectboxValue(node){
@@ -223,6 +226,8 @@ function onChangeCondition(){
             value2: getSelectboxValue(slide.select(ar[3]).node()),
         };
     });
+
+    condition.filter = slide.select("input[name=filter]:checked").node().value;
     drawGraph();
 }
 
@@ -285,22 +290,27 @@ function drawGraph() {
         maxY = 0,
         maxR = 0,
         inputData = data.reduce(function(rt, each){
-            return rt.concat(each.level.map(function(eachLevel){
-                var x = calcValue(each, eachLevel, condition.x),
-                    y = calcValue(each, eachLevel, condition.y),
-                    r = calcValue(each, eachLevel, condition.r);
-                maxX = Math.max(maxX, x);
-                maxY = Math.max(maxY, y);
-                maxR = Math.max(maxR, r);
-                return {
-                    x:x,
-                    y:y,
-                    r:r,
-                    className: each.name.split('.').join('').slice(0, 3),
-                    base: each,
-                    level: eachLevel,
-                };
-            }));
+            if( (condition.filter!=='normal' && each.isDark) ||
+                (condition.filter!=='dark' && !each.isDark)
+            ){
+                rt = rt.concat(each.level.map(function(eachLevel){
+                    var x = calcValue(each, eachLevel, condition.x),
+                        y = calcValue(each, eachLevel, condition.y),
+                        r = calcValue(each, eachLevel, condition.r);
+                    maxX = Math.max(maxX, x);
+                    maxY = Math.max(maxY, y);
+                    maxR = Math.max(maxR, r);
+                    return {
+                        x:x,
+                        y:y,
+                        r:r,
+                        className: each.name.split('.').join('').slice(0, 3),
+                        base: each,
+                        level: eachLevel,
+                    };
+                }));
+            }
+            return rt;
         }, []);
 
     xScale.domain([0, maxX]);
@@ -314,7 +324,7 @@ function drawGraph() {
         .data(inputData);
 
     circle
-        .on("touchstart", onTouchStart)
+        .on(CLICK_EVENT, onTouchStart)
         .attr("class", function(d){ return "troop-circle " + d.className; })
         .attr("r", function(d){ return rScale(d.r);})
         .attr("cx", function(d){ return xScale(d.x); })
@@ -323,7 +333,7 @@ function drawGraph() {
 
     circle.enter()
         .append("circle")
-        .on("touchstart", onTouchStart)
+        .on(CLICK_EVENT, onTouchStart)
         .attr("class", function(d){ return "troop-circle " + d.className; })
         .attr("r", function(d){ return rScale(d.r);})
         .attr("cx", function(d){ return xScale(d.x); })
@@ -337,15 +347,56 @@ function drawGraph() {
 }
 
 function showData(circle){
-    d3.select(circle)
+    var data = d3.select(circle)
         .classed("active", true)
-    ;
+        .data().pop();
+
+    [
+        ['#troop-name', data.base.name],
+        ['#troop-level', data.level.LEVEL],
+        ['#troop-damage', data.level.DAMAGE],
+        ['#troop-hitpoints', data.level.HP],
+        ['#troop-cost', data.level.COST],
+        ['#troop-space', data.base.base.SPACE],
+        ['#troop-time', data.base.base.TIME],
+    ]
+    .forEach(function(ar){
+        d3.select(ar[0])
+            .html(ar[1])
+            ;
+    });
+
+    var cx = parseFloat(d3.select(circle).attr('cx')),
+        cy = parseFloat(d3.select(circle).attr('cy')),
+        r = parseFloat(d3.select(circle).attr('r'));
+
+    d3.select('#tooltip')
+        .style('display', 'block')
+        .style('top', function(){
+            var height = d3.select('#tooltip').node().offsetHeight,
+                top = margin.top + cy + r + 3;
+            top = Math.max(top, 0);
+            top = Math.min(top, windowHeight - height);
+            return top + 'px';
+        })
+        .style('left', function(){
+            var width = d3.select('#tooltip').node().offsetWidth,
+                left = margin.left + cx - width / 2;
+            left = Math.max(left, 0);
+            left = Math.min(left, windowWidth - width);
+            return left + 'px';
+        })
+        ;
+
+
     activeCircle = circle;
 }
 
 function hideData(){
     d3.select(activeCircle)
         .classed("active", false);
+    d3.select('#tooltip')
+        .style('display', 'none');
 }
 
 function onTouchSvg(){

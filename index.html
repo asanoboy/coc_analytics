@@ -69,13 +69,32 @@
         -o-transform: rotate(-90deg);
         -ms-transform: rotate(-90deg);
 
-        -moz-transform-origin: left top;
-        -webkit-transform-origin: left top;
-        -o-transform-origin: left top;
-        -ms-transform-origin: left top;
+        -moz-transform-origin: right top;
+        -webkit-transform-origin: right top;
+        -o-transform-origin: right top;
+        -ms-transform-origin: right top;
+      }
+
+      #tooltip {
+        background-color: #FFF;
+        border: 1px solid #333;
+        padding: 3px;
+
+        position: absolute;
+        left: 0;
+        top: 0;
+        display: none;
+      }
+
+      #tooltip p {
+        margin: 2px 5px;
+      }
+      #tooltip td {
+        padding: 1px 2px;
       }
 
       svg {
+        z-index: 1;
         margin: 0;
         padding: 0;
         display: block;
@@ -188,6 +207,33 @@
         <section id="main_content">
           <div id="y-axis-label"><p>left</p></div>
           <div id="x-axis-label"><p>bottom</p></div>
+          <div id="tooltip">
+            <table>
+              <tr>
+                <td colspan="2"><span id="troop-name">Name</span>: LV<span id="troop-level">3</span></td>
+              </tr>
+              <tr>
+                <td>Damage</td>
+                <td id="troop-damage">202</td>
+              </tr>
+              <tr>
+                <td>Hitpoints</td>
+                <td id="troop-hitpoints">000</td>
+              </tr>
+              <tr>
+                <td>Cost</td>
+                <td id="troop-cost">330</td>
+              </tr>
+              <tr>
+                <td>Space</td>
+                <td id="troop-space">3</td>
+              </tr>
+              <tr>
+                <td>Time</td>
+                <td id="troop-time" >330</td>
+              </tr>
+            </table>
+          </div>
         </section>
 
         <footer>
@@ -198,7 +244,13 @@
         <section id="panel-content">
           <h3>Graph Condition</h3>
           <hr>
-          <p>X Axis<br/> 
+          <p>
+            <input id="filter-all" type="radio" name="filter" value="all" checked><label for="filter-all">All</label> |
+            <input id="filter-normal" type="radio" name="filter" value="normal"><label for="filter-normal">Normal</label> |
+            <input id="filter-dark" type="radio" name="filter" value="dark"><label for="filter-dark">Dark</label>
+          </p>
+          <hr>
+          <p>X Axis<br> 
             X =
             <select id="x-value1">
             </select>
@@ -208,7 +260,7 @@
             </select>
           </p>
           <hr>
-          <p>Y Axis<br/>
+          <p>Y Axis<br>
             Y = 
             <select id="y-value1">
             </select>
@@ -218,7 +270,7 @@
             </select>
           </p>
           <hr>
-          <p>Radius<br/>
+          <p>Radius<br>
             R = 
             <select id="r-value1">
             </select>
