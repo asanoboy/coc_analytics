@@ -75,6 +75,35 @@
         -ms-transform-origin: right top;
       }
 
+      .toggle-cond path{
+        fill: #000000; 
+      }
+      .toggle-cond {
+        float: right;
+        width: 24px;
+        height: 24px;
+        padding: 9px;
+      }
+      .toggle-cond.active {
+        /*background-color: #CCC; */
+/*        -webkit-border-radius: 3px;
+        background-color: #F8F8F8;
+        background-image: -webkit-gradient(linear, left top, left bottom, from(#F8F8F8), to(#EEE));
+        background-image: -webkit-linear-gradient(top, #F8F8F8, #EEE);
+*/          
+          background: -moz-linear-gradient(top,#FFF 0%,#E9E9E9);
+          background: -webkit-gradient(linear, left top, left bottom, from(#FFF), to(#E9E9E9));
+          border-radius: 3px;
+          -moz-border-radius: 3px;
+          -webkit-border-radius: 3px;
+          -moz-box-shadow: inset 2px 2px 2px rgba(000,000,000,0.1);
+          -webkit-box-shadow: inset 2px 2px 2px rgba(000,000,000,0.1);
+
+      }
+      .toggle-cond.active path{
+        fill: #000000; 
+      }
+
       #tooltip {
         background-color: #FFF;
         border: 1px solid #333;
@@ -116,16 +145,16 @@
 
       .troop-circle {
         stroke: black;
-        stroke-width: 2;
-        fill-opacity: 0.7;
+        stroke-width: 0.5;
+        fill-opacity: 0.75;
       }
       .troop-circle.active {
         fill-opacity: 1;
         stroke-width: 3;
       }
       .troop-circle.Bar {
-        fill: #FFFF35;
-        stroke: #9C453B;
+        fill: #FBDEBB;
+        stroke: #FFE22B;
       }
       .troop-circle.Arc {
         fill: #D51461;
@@ -137,19 +166,19 @@
       }
       .troop-circle.Gia {
         fill: #FFD6B3;
-        stroke: #F26A04;
+        stroke: #805C47;
       }
       .troop-circle.Wal {
-        fill: #FBF2D9;
+        fill: #F9F4E6;
         stroke: #D77632;
       }
       .troop-circle.Bal {
-        fill: #FCC320;
-        stroke: #D5B389;
+        fill: #FC4E2D;
+        stroke: #C28D4F;
       }
       .troop-circle.Wiz {
-        fill: #FCE9D4;
-        stroke: #779BDB;
+        fill: #9756D0;
+        stroke: #864532;
       }
       .troop-circle.Hea {
         fill: #F3F77A;
@@ -168,8 +197,8 @@
         stroke: #3D3242;
       }
       .troop-circle.Hog {
-        fill: #FED0D2;
-        stroke: #C7704D;
+        fill: #B16346;
+        stroke: #FEB8A8;
       }
       .troop-circle.Val {
         fill: #F4B8A3;
@@ -194,11 +223,10 @@
     <div id="container">
       <div id="inner-container" class="inner">
 
-        <section class="header">
-          <span class="toggle-cond">COND</span>
-        </section>
-
         <header>
+          <svg class="toggle-cond" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" width="21.59px" height="21.137px" viewBox="0 0 21.59 21.137" style="enable-background:new 0 0 21.59 21.137;" xml:space="preserve" xmlns:xml="http://www.w3.org/XML/1998/namespace">
+            <path style="" d="M18.622,8.145L18.077,6.85c0,0,1.268-2.861,1.156-2.971L17.554,2.24  c-0.116-0.113-2.978,1.193-2.978,1.193L13.256,2.9c0,0-1.166-2.9-1.326-2.9H9.561C9.396,0,8.317,2.906,8.317,2.906L6.999,3.441  c0,0-2.922-1.242-3.034-1.131L2.289,3.951C2.173,4.064,3.507,6.867,3.507,6.867L2.962,8.16C2.962,8.16,0,9.301,0,9.455v2.322  c0,0.162,2.969,1.219,2.969,1.219l0.545,1.291c0,0-1.268,2.859-1.157,2.969l1.678,1.643c0.114,0.111,2.977-1.195,2.977-1.195  l1.321,0.535c0,0,1.166,2.898,1.327,2.898h2.369c0.164,0,1.244-2.906,1.244-2.906l1.322-0.535c0,0,2.916,1.242,3.029,1.133  l1.678-1.641c0.117-0.115-1.22-2.916-1.22-2.916l0.544-1.293c0,0,2.963-1.143,2.963-1.299v-2.32  C21.59,9.199,18.622,8.145,18.622,8.145z M14.256,10.568c0,1.867-1.553,3.387-3.461,3.387c-1.906,0-3.461-1.52-3.461-3.387  s1.555-3.385,3.461-3.385C12.704,7.184,14.256,8.701,14.256,10.568z"/>
+          </svg>
           <h1>Coc analytics</h1>
           <h2>Analytics for Crash of Clans </h2>
         </header>
@@ -207,38 +235,38 @@
         <section id="main_content">
           <div id="y-axis-label"><p>left</p></div>
           <div id="x-axis-label"><p>bottom</p></div>
-          <div id="tooltip">
-            <table>
-              <tr>
-                <td colspan="2"><span id="troop-name">Name</span>: LV<span id="troop-level">3</span></td>
-              </tr>
-              <tr>
-                <td>Damage</td>
-                <td id="troop-damage">202</td>
-              </tr>
-              <tr>
-                <td>Hitpoints</td>
-                <td id="troop-hitpoints">000</td>
-              </tr>
-              <tr>
-                <td>Cost</td>
-                <td id="troop-cost">330</td>
-              </tr>
-              <tr>
-                <td>Space</td>
-                <td id="troop-space">3</td>
-              </tr>
-              <tr>
-                <td>Time</td>
-                <td id="troop-time" >330</td>
-              </tr>
-            </table>
-          </div>
         </section>
 
         <footer>
           Coc analytics is maintained by <a href="https://github.com/asanoboy">asanoboy</a>.
         </footer>
+      </div>
+      <div id="tooltip">
+        <table>
+          <tr>
+            <td colspan="2"><span id="troop-name">Name</span>: LV<span id="troop-level">3</span></td>
+          </tr>
+          <tr>
+            <td>Damage</td>
+            <td id="troop-damage">202</td>
+          </tr>
+          <tr>
+            <td>Hitpoints</td>
+            <td id="troop-hitpoints">000</td>
+          </tr>
+          <tr>
+            <td>Cost</td>
+            <td id="troop-cost">330</td>
+          </tr>
+          <tr>
+            <td>Space</td>
+            <td id="troop-space">3</td>
+          </tr>
+          <tr>
+            <td>Time</td>
+            <td id="troop-time" >330</td>
+          </tr>
+        </table>
       </div>
       <div id="slide-container">
         <section id="panel-content">
@@ -250,7 +278,7 @@
             <input id="filter-dark" type="radio" name="filter" value="dark"><label for="filter-dark">Dark</label>
           </p>
           <hr>
-          <p>X Axis<br> 
+          <p>
             X =
             <select id="x-value1">
             </select>
@@ -260,7 +288,7 @@
             </select>
           </p>
           <hr>
-          <p>Y Axis<br>
+          <p>
             Y = 
             <select id="y-value1">
             </select>
@@ -270,7 +298,7 @@
             </select>
           </p>
           <hr>
-          <p>Radius<br>
+          <p>
             R = 
             <select id="r-value1">
             </select>
