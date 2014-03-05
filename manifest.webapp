@@ -2,9 +2,8 @@ CACHE MANIFEST
 # 2014-03-06:v1
 
 CACHE:
-main.manifest
+manifest.webapp
 data.js
-font/uOXSiKkEygwkvR4cgUzOz3YhjbSpvc47ee6xR_80Hnw.woff
 images/body-bg.png
 images/highlight-bg.jpg
 images/hr.png
@@ -15,7 +14,6 @@ index.html
 javascripts/main.js
 javascripts/d3.v3.min.js
 params.json
-stylesheets/font.css
 stylesheets/print.css
 stylesheets/pygment_trac.css
 stylesheets/stylesheet.css
