@@ -141,15 +141,27 @@ function convertString(string){
     }
 }
 
+function getFromStorage(key){
+    return localStorage ?
+        localStorage.getItem(key):
+        false;
+}
+
+function setToStorage(key, value){
+    if( localStorage ){
+        localStorage.setItem(key, value);
+    }
+}
+
 function initGraph(){
     var columns = Object.keys(data[0].base).concat(Object.keys(data[0].level[0]));
     [
-        ['#x-value1', 'DAMAGE'],
-        ['#x-value2', 'SPACE'],
-        ['#y-value1', 'HP'],
-        ['#y-value2', 'SPACE'],
-        ['#r-value1', 'COST'],
-        ['#r-value2', ''],
+        ['#x-value1', getFromStorage('x1') || 'DAMAGE'],
+        ['#x-value2', getFromStorage('x2') || 'SPACE'],
+        ['#y-value1', getFromStorage('y1') || 'HP'],
+        ['#y-value2', getFromStorage('y2') || 'SPACE'],
+        ['#r-value1', getFromStorage('r1') || 'COST'],
+        ['#r-value2', getFromStorage('r2') || ''],
     ]
     .forEach(function(ar){
         slide.select(ar[0])
@@ -195,6 +207,15 @@ function initGraph(){
         ;
     });
 
+    var filter = getFromStorage('filter');
+    if( filter ){
+        slide.selectAll('input[name=filter]')
+            .each(function(){
+                if( this.value === filter ){
+                    this.checked = true;
+                }
+            });
+    }
     slide.selectAll("input[name=filter]")
         .on('change', onChangeCondition)
     ;
@@ -235,6 +256,22 @@ function onChangeCondition(){
     });
 
     condition.filter = slide.select("input[name=filter]:checked").node().value;
+
+    [
+        ['#x-value1', 'x1'],
+        ['#x-value2', 'x2'],
+        ['#y-value1', 'y1'],
+        ['#y-value2', 'y2'],
+        ['#r-value1', 'r1'],
+        ['#r-value2', 'r2'],
+    ]
+    .forEach(function(ar){
+        setToStorage(
+            ar[1],
+            getSelectboxValue(slide.select(ar[0]).node())
+        );
+    });
+    setToStorage('filter', condition.filter);
     drawGraph();
 }
 
