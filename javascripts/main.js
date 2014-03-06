@@ -3,7 +3,8 @@ var svg, slide, graph, activeCircle,
     windowHeight, windowWidth, condition = {},
     xScale, yScale, rScale, xAxis, yAxis, margin,
     costScaleFromDark, isSlideVisible = false,
-    CLICK_EVENT = 'ontouchstart' in window ? 'touchstart' : 'mousedown';
+    IS_SP = 'ontouchstart' in window,
+    CLICK_EVENT = IS_SP ? 'touchstart' : 'mousedown';
 initData();
 initSvg();
 initSlide();
@@ -35,9 +36,9 @@ function initSvg(){
     windowHeight = w.innerHeight|| e.clientHeight|| g.clientHeight;
     windowWidth = w.innerWidth || e.clientWidth || g.clientWidth;
 
-    var minMargin = 35,
-        canvasWidth = d3.select('#inner-container').node().offsetWidth,
+    var canvasWidth = d3.select('#inner-container').node().offsetWidth,
         canvasHeight = windowHeight - d3.select('#inner-container').node().offsetHeight,
+        minMargin = canvasWidth > 350 ? canvasWidth / 10 : 35,
         graphWidth = Math.min(canvasWidth - minMargin * 2, canvasHeight - minMargin * 2),
         graphHeight = graphWidth,
         maxRadius = graphWidth / 10,
@@ -93,14 +94,11 @@ function initSvg(){
 }
 
 function initSlide(){
-    var leftDest = svg.node().getBoundingClientRect().left,
-        leftOrig = windowWidth + 10;
     slide = d3.select('#slide-container')
         .style('display', 'none')
         .style('width', svg.node().clientWidth + 'px')
         .style('height', svg.node().clientHeight + 'px')
         .style('top', svg.node().getBoundingClientRect().top + 'px')
-        .style('left', leftOrig + 'px')
     ;
 
     var lastPageX = false;
@@ -110,8 +108,7 @@ function initSlide(){
             d3.select(this).classed('active', false);
             slide
                 // .transition()
-                .style('display', 'none')
-                .style('left', leftOrig + 'px');
+                .style('display', 'none');
             isSlideVisible = false;
         }
         else {
@@ -119,7 +116,7 @@ function initSlide(){
             slide
                 // .transition()
                 .style('display', 'block')
-                .style('left', leftDest + 'px');
+                .style('left', svg.node().getBoundingClientRect().left + 'px');
             isSlideVisible = true;
         }
     }
@@ -160,7 +157,7 @@ function initGraph(){
         ['#x-value2', getFromStorage('x2') || 'SPACE'],
         ['#y-value1', getFromStorage('y1') || 'HP'],
         ['#y-value2', getFromStorage('y2') || 'SPACE'],
-        ['#r-value1', getFromStorage('r1') || 'COST'],
+        ['#r-value1', getFromStorage('r1') || 'LEVEL'],
         ['#r-value2', getFromStorage('r2') || ''],
     ]
     .forEach(function(ar){
@@ -371,6 +368,7 @@ function drawGraph() {
 
     circle
         .on(CLICK_EVENT, onTouchStart)
+        .on('mouseover', onTouchStart)
         .attr("class", function(d){ return "troop-circle " + d.className; })
         .attr("r", function(d){ return rScale(d.r);})
         .attr("cx", function(d){ return xScale(d.x); })
@@ -380,6 +378,7 @@ function drawGraph() {
     circle.enter()
         .append("circle")
         .on(CLICK_EVENT, onTouchStart)
+        .on('mouseover', onTouchStart)
         .attr("class", function(d){ return "troop-circle " + d.className; })
         .attr("r", function(d){ return rScale(d.r);})
         .attr("cx", function(d){ return xScale(d.x); })
