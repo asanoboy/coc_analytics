@@ -1,6 +1,6 @@
 var svg, slide, graph, activeCircle,
     tooltip, xAxisLabel, yAxisLabel,
-    windowHeight, windowWidth, condition = {},
+    windowHeight, windowWidth, condition = {}, hashCondition,
     xScale, yScale, rScale, xAxis, yAxis, margin,
     costScaleFromDark, isSlideVisible = false,
     IS_SP = 'ontouchstart' in window,
@@ -150,15 +150,51 @@ function setToStorage(key, value){
     }
 }
 
+function getFromHash(key){
+    return key in hashCondition && hashCondition[key];
+}
+
+function parseHash(){
+    var hash = document.location.hash + '';
+    hashCondition = hash.split('.').reduce(function(rt, str){
+        var ar = str.split(',');
+        if( ar.length === 2 ){
+            rt[ar[0]] = ar[1];
+        }
+        return rt;
+    }, {});
+}
+
+function createHash(){
+    var hash = [];
+    var keyValue = {};
+    ['x', 'y', 'r'].forEach(function(x){
+        if( x in condition ){
+            keyValue[x+'1'] = condition[x].value1;
+            keyValue[x+'2'] = condition[x].value2;
+            keyValue[x+'ope'] = condition[x].operator;
+        }
+    });
+    if( 'filter' in condition ){
+        keyValue.filter = condition.filter;
+    }
+
+    for( var key in keyValue ){
+        hash.push(key + ',' + keyValue[key]);
+    }
+    return hash.join('.');
+}
+
 function initGraph(){
+    parseHash();
     var columns = Object.keys(data[0].base).concat(Object.keys(data[0].level[0]));
     [
-        ['#x-value1', getFromStorage('x1') || 'DAMAGE'],
-        ['#x-value2', getFromStorage('x2') || 'SPACE'],
-        ['#y-value1', getFromStorage('y1') || 'HP'],
-        ['#y-value2', getFromStorage('y2') || 'SPACE'],
-        ['#r-value1', getFromStorage('r1') || 'LEVEL'],
-        ['#r-value2', getFromStorage('r2') || ''],
+        ['#x-value1', getFromHash('x1') || getFromStorage('x1') || 'DAMAGE'],
+        ['#x-value2', getFromHash('x2') || getFromStorage('x2') || 'SPACE'],
+        ['#y-value1', getFromHash('y1') || getFromStorage('y1') || 'HP'],
+        ['#y-value2', getFromHash('y2') || getFromStorage('y2') || 'SPACE'],
+        ['#r-value1', getFromHash('y1') || getFromStorage('r1') || 'LEVEL'],
+        ['#r-value2', getFromHash('y2') || getFromStorage('r2') || ''],
     ]
     .forEach(function(ar){
         slide.select(ar[0])
@@ -183,9 +219,9 @@ function initGraph(){
         ['mul', 'x'],
     ];
     [
-        ['#x-operator', 'div',  '#x-value2'],
-        ['#y-operator', 'div',  '#y-value2'],
-        ['#r-operator', '',     '#r-value2'],
+        ['#x-operator', getFromHash('xope') || getFromStorage('xope') || 'div',  '#x-value2'],
+        ['#y-operator', getFromHash('yope') || getFromStorage('yope') || 'div',  '#y-value2'],
+        ['#r-operator', getFromHash('rope') || getFromStorage('rope') || '',     '#r-value2'],
     ]
     .forEach(function(ar){
         slide.select(ar[0])
@@ -204,7 +240,7 @@ function initGraph(){
         ;
     });
 
-    var filter = getFromStorage('filter');
+    var filter = getFromHash('filter') || getFromStorage('filter');
     if( filter ){
         slide.selectAll('input[name=filter]')
             .each(function(){
@@ -257,10 +293,13 @@ function onChangeCondition(){
     [
         ['#x-value1', 'x1'],
         ['#x-value2', 'x2'],
+        ['#x-operator', 'xope'],
         ['#y-value1', 'y1'],
         ['#y-value2', 'y2'],
+        ['#y-operator', 'yope'],
         ['#r-value1', 'r1'],
         ['#r-value2', 'r2'],
+        ['#r-operator', 'rope'],
     ]
     .forEach(function(ar){
         setToStorage(
@@ -270,6 +309,7 @@ function onChangeCondition(){
     });
     setToStorage('filter', condition.filter);
     drawGraph();
+    document.location.hash = createHash();
 }
 
 function applyOperator(value1, value2, operator){
