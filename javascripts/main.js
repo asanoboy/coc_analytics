@@ -138,20 +138,31 @@ function convertString(string){
     }
 }
 
-function getFromStorage(key){
-    return localStorage ?
-        localStorage.getItem(key):
-        false;
-}
-
-function setToStorage(key, value){
-    if( localStorage ){
-        localStorage.setItem(key, value);
-    }
-}
-
 function getFromHash(key){
     return key in hashCondition && hashCondition[key];
+}
+
+function getValue(key){
+    var value;
+    value = getFromHash(key);
+    if( value !== false ){
+        return value;
+    }
+
+    var defaults = {
+        x1: 'DAMAGE',
+        x2: 'SPACE',
+        xope: 'div',
+        y1: 'HP',
+        y2: 'SPACE',
+        yope: 'div',
+        r1: 'LEVEL',
+        r2: '',
+        rope: '',
+        filter: 'all',
+    };
+
+    return key in defaults ? defaults[key] : false;
 }
 
 function parseHash(){
@@ -189,12 +200,12 @@ function initGraph(){
     parseHash();
     var columns = Object.keys(data[0].base).concat(Object.keys(data[0].level[0]));
     [
-        ['#x-value1', getFromHash('x1') || getFromStorage('x1') || 'DAMAGE'],
-        ['#x-value2', getFromHash('x2') || getFromStorage('x2') || 'SPACE'],
-        ['#y-value1', getFromHash('y1') || getFromStorage('y1') || 'HP'],
-        ['#y-value2', getFromHash('y2') || getFromStorage('y2') || 'SPACE'],
-        ['#r-value1', getFromHash('y1') || getFromStorage('r1') || 'LEVEL'],
-        ['#r-value2', getFromHash('y2') || getFromStorage('r2') || ''],
+        ['#x-value1', getValue('x1')],
+        ['#x-value2', getValue('x2')],
+        ['#y-value1', getValue('y1')],
+        ['#y-value2', getValue('y2')],
+        ['#r-value1', getValue('r1')],
+        ['#r-value2', getValue('r2')],
     ]
     .forEach(function(ar){
         slide.select(ar[0])
@@ -219,9 +230,9 @@ function initGraph(){
         ['mul', 'x'],
     ];
     [
-        ['#x-operator', getFromHash('xope') || getFromStorage('xope') || 'div',  '#x-value2'],
-        ['#y-operator', getFromHash('yope') || getFromStorage('yope') || 'div',  '#y-value2'],
-        ['#r-operator', getFromHash('rope') || getFromStorage('rope') || '',     '#r-value2'],
+        ['#x-operator', getValue('xope'),  '#x-value2'],
+        ['#y-operator', getValue('yope'),  '#y-value2'],
+        ['#r-operator', getValue('rope'),     '#r-value2'],
     ]
     .forEach(function(ar){
         slide.select(ar[0])
@@ -240,15 +251,13 @@ function initGraph(){
         ;
     });
 
-    var filter = getFromHash('filter') || getFromStorage('filter');
-    if( filter ){
-        slide.selectAll('input[name=filter]')
-            .each(function(){
-                if( this.value === filter ){
-                    this.checked = true;
-                }
-            });
-    }
+    var filter = getValue('filter');
+    slide.selectAll('input[name=filter]')
+        .each(function(){
+            if( this.value === filter ){
+                this.checked = true;
+            }
+        });
     slide.selectAll("input[name=filter]")
         .on('change', onChangeCondition)
     ;
@@ -290,24 +299,6 @@ function onChangeCondition(){
 
     condition.filter = slide.select("input[name=filter]:checked").node().value;
 
-    [
-        ['#x-value1', 'x1'],
-        ['#x-value2', 'x2'],
-        ['#x-operator', 'xope'],
-        ['#y-value1', 'y1'],
-        ['#y-value2', 'y2'],
-        ['#y-operator', 'yope'],
-        ['#r-value1', 'r1'],
-        ['#r-value2', 'r2'],
-        ['#r-operator', 'rope'],
-    ]
-    .forEach(function(ar){
-        setToStorage(
-            ar[1],
-            getSelectboxValue(slide.select(ar[0]).node())
-        );
-    });
-    setToStorage('filter', condition.filter);
     drawGraph();
     document.location.hash = createHash();
 }
