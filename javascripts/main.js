@@ -167,6 +167,7 @@ function getValue(key){
 
 function parseHash(){
     var hash = document.location.hash + '';
+    hash = hash.replace(/#/g, '');
     hashCondition = hash.split('.').reduce(function(rt, str){
         var ar = str.split(',');
         if( ar.length === 2 ){
