@@ -435,7 +435,18 @@ function showData(circle){
         ['#troop-hitpoints', data.level.HP],
         ['#troop-cost', data.level.COST],
         ['#troop-space', data.base.base.SPACE],
-        ['#troop-time', data.base.base.TIME],
+        ['#troop-time', (function(time){
+            var sec = time % 60;
+            var min = ( time - sec ) / 60;
+            var rt = [];
+            if( min>0 ){
+                rt.push(min+'m');
+            }
+            if( sec>0 ){
+                rt.push(sec+'s');
+            }
+            return rt.join(' ');
+        })(data.base.base.TIME)],
     ]
     .forEach(function(ar){
         d3.select(ar[0])
