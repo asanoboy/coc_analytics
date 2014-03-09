@@ -119,8 +119,20 @@ _.extend(Builder.prototype, {
                 }
                 baseData = baseData.pop();
                 baseData = renameObjectKey(baseData, _.invert(TROOPS_TO_COLUMNS[troops[i]].BASE));
+                for( var key in baseData ){
+                    if( key === 'TIME' && baseData[key].match(/^\d+m$/) ){
+                        baseData[key] = parseInt(baseData[key], 10) * 60;
+                    }
+                    else {
+                        baseData[key] = parseInt(baseData[key], 10);
+                    }
+                }
                 levelData = levelData.map(function(data){
-                    return renameObjectKey(data, _.invert(TROOPS_TO_COLUMNS[troops[i]].LEVEL));
+                    data = renameObjectKey(data, _.invert(TROOPS_TO_COLUMNS[troops[i]].LEVEL));
+                    for( var key in data ){
+                        data[key] = parseInt(data[key], 10);
+                    }
+                    return data;
                 });
                 var troop = new Troop(troops[i], baseData, levelData);
                 troopList.push(troop);
@@ -197,7 +209,7 @@ _.extend(Builder.prototype, {
                 if( j in indexToClm ){
                     data || (data={});
                     var text = $(td).text().replace(/(\n|,)/g, '');
-                    data[indexToClm[j]] = parseInt(text, 10);
+                    data[indexToClm[j]] = text;
                 }
             });
 
