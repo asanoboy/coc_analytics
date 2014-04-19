@@ -166,8 +166,9 @@ function getValue(key){
 }
 
 function parseHash(){
-    var hash = document.location.hash + '';
-    hash = hash.replace(/#/g, '');
+    // var hash = document.location.hash + '';
+    var hash = localStorage.getItem('conf');
+    hash = hash ? hash.replace(/#/g, '') : '';
     hashCondition = hash.split('.').reduce(function(rt, str){
         var ar = str.split(',');
         if( ar.length === 2 ){
@@ -301,7 +302,8 @@ function onChangeCondition(){
     condition.filter = slide.select("input[name=filter]:checked").node().value;
 
     drawGraph();
-    document.location.hash = createHash();
+    // document.location.hash = createHash();
+    localStorage.setItem('conf', createHash());
 }
 
 function applyOperator(value1, value2, operator){
